@@ -2,14 +2,22 @@ const express = require('express')
 const app = express()
 app.use(express.json())
 app.get('/notes', (req, res) => {
-    res.send("hERE")
+    res.send("Here is your data")
 })
 app.post('/notes', (req, res) => {
     console.log(req.body);
+    res.send("sent")
+
     
-    res.send("Sent Bro")
 })
+
+app.delete('/notes/:id', (req, res) => {
+    console.log(req.params.id);
+    res.send('note deleted!')
+    
+})
+
 app.listen(3000, () => {
-    console.log("Live Baby");
+    console.log("Running");
     
 })
