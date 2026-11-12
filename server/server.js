@@ -1,31 +1,33 @@
-const dns = require("dns")
+const dns = require('dns')
 dns.setServers(["8.8.8.8", "1.1.1.1"])
-require("dotenv").config()
+require('dotenv').config()
 const mongoose = require("mongoose")
 const express = require("express")
 const app = express()
+app.use(express.json())
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
-        console.log("Connected to mongoDB");
+        console.log("Connected to Mongo");
     })
     .catch((err) => {
-        console.log("Connection Failed:",err);
-    })
-
-app.use(express.json())
+        console.log("Connection Failure",err);
+    }) 
+const noteSchema = new mongoose.Schema({
+    courseCode: String,
+    courseTitle: String,
+    lecturerName: String,
+    noteTitle: String,
+    fileLink: String
+})
+const Note = mongoose.model("Note", noteSchema)
 let notes = []
 app.get('/notes', (req, res) => {
-    res.json(notes) 
+    res.json(notes)
     console.log(notes);
 })
-let count = 0
-app.post('/notes', (req, res) => {
-    console.log(req.body);
-    count = count + 1
-    const note = { id: count, ...req.body }
-    notes.push(note)
-    console.log(notes);
-    res.send("Notes Posted")
+app.post('/notes', async (req, res) => {
+    const saved = await Note.create(req.body)
+    res.json(saved)
 })
 app.delete('/notes/:id', (req, res) => {
     const position = notes.findIndex(note => note.id === Number(req.params.id))
@@ -38,6 +40,5 @@ app.delete('/notes/:id', (req, res) => {
     res.send("Deleted")
 })
 app.listen(3000, () => {
-    console.log("Live");
-    
+    console.log("Listening");
 })
